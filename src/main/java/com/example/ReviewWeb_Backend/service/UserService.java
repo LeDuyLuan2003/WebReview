@@ -1,9 +1,8 @@
 package com.example.ReviewWeb_Backend.service;
 
-import com.example.ReviewWeb_Backend.exception.CustomException;
 import com.example.ReviewWeb_Backend.model.Role;
 import com.example.ReviewWeb_Backend.model.User;
-import com.example.ReviewWeb_Backend.model.enumRole;
+import com.example.ReviewWeb_Backend.exception.CustomException;
 import com.example.ReviewWeb_Backend.repository.RoleRepository;
 import com.example.ReviewWeb_Backend.repository.UserRepository;
 import com.example.ReviewWeb_Backend.security.JwtTokenProvider;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -33,7 +33,7 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role role = roleRepository.findByName(enumRole.USER)
+        Role role = roleRepository.findByName("USER")
                 .orElseThrow(() -> new CustomException("Role not found", HttpStatus.NOT_FOUND));
 
         user.setRole(role);  // Gán vai trò cho người dùng
@@ -59,25 +59,23 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     // Nếu không có, đăng ký tài khoản mới với email từ Google
-                    Role role = roleRepository.findByName(enumRole.USER)
+                    Role role = roleRepository.findByName("USER")  // Tìm role bằng tên "USER"
                             .orElseThrow(() -> new CustomException("Role not found", HttpStatus.NOT_FOUND));
 
-                    // Tạo đối tượng User bằng constructor có tham số
-                    User newUser = new User(
-                            null,                  // id sẽ được tự động tạo từ MongoDB
-                            email,                 // username
-                            "",                    // password rỗng, vì là đăng nhập qua Google
-                            email,                 // email
-                            role                   // role USER
-                    );
+                    // Sử dụng @Builder để tạo đối tượng User
+                    User newUser = User.builder()
+                            .email(email)
+                            .username(email)   // Hoặc lấy tên từ Google nếu có
+                            .password("")      // Để trống vì không cần mật khẩu khi đăng nhập Google
+                            .role(role)        // Gán role USER
+                            .build();
 
-                    return userRepository.save(newUser);
+                    return userRepository.save(newUser);  // Lưu người dùng mới vào CSDL
                 });
 
         // Tạo JWT token và trả về cho người dùng
         return jwtTokenProvider.generateToken(user.getEmail());
     }
-
 
 
 }
