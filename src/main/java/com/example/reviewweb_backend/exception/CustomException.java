@@ -1,4 +1,4 @@
-package com.example.ReviewWeb_Backend.exception;
+package com.example.reviewweb_backend.exception;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,4 +1,4 @@
-package com.example.ReviewWeb_Backend.model;
+package com.example.reviewweb_backend.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

@@ -1,6 +1,5 @@
-package com.example.ReviewWeb_Backend.exception;
+package com.example.reviewweb_backend.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

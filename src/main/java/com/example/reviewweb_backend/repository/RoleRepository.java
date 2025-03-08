@@ -1,6 +1,6 @@
-package com.example.ReviewWeb_Backend.repository;
+package com.example.reviewweb_backend.repository;
 
-import com.example.ReviewWeb_Backend.model.Role;
+import com.example.reviewweb_backend.model.Role;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

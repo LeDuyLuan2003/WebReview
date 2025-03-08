@@ -1,17 +1,16 @@
-package com.example.ReviewWeb_Backend.service;
+package com.example.reviewweb_backend.service;
 
-import com.example.ReviewWeb_Backend.model.Role;
-import com.example.ReviewWeb_Backend.model.User;
-import com.example.ReviewWeb_Backend.exception.CustomException;
-import com.example.ReviewWeb_Backend.repository.RoleRepository;
-import com.example.ReviewWeb_Backend.repository.UserRepository;
-import com.example.ReviewWeb_Backend.security.JwtTokenProvider;
+import com.example.reviewweb_backend.model.Role;
+import com.example.reviewweb_backend.model.User;
+import com.example.reviewweb_backend.exception.CustomException;
+import com.example.reviewweb_backend.repository.RoleRepository;
+import com.example.reviewweb_backend.repository.UserRepository;
+import com.example.reviewweb_backend.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -42,14 +41,30 @@ public class UserService {
 
     // Đăng nhập người dùng và tạo JWT Token
     public String loginUser(User user) {
-        User existingUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new CustomException("Invalid email or password!", HttpStatus.UNAUTHORIZED));
+        // Kiểm tra xem user có cung cấp email hay username
+        User existingUser;
 
-        if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            throw new CustomException("Invalid email or password!", HttpStatus.UNAUTHORIZED);
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            existingUser = userRepository.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new CustomException("Invalid email or password!", HttpStatus.UNAUTHORIZED));
+        } else if (user.getUsername() != null && !user.getUsername().isEmpty()) {
+            existingUser = userRepository.findByUsername(user.getUsername())
+                    .orElseThrow(() -> new CustomException("Invalid username or password!", HttpStatus.UNAUTHORIZED));
+        } else {
+            throw new CustomException("Email or username must be provided!", HttpStatus.BAD_REQUEST);
         }
 
-        return jwtTokenProvider.generateToken(existingUser.getEmail());
+        // Kiểm tra mật khẩu
+        if (user.getPassword() == null || !passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
+            throw new CustomException("Invalid credentials!", HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            // Tạo token với email của người dùng
+            return jwtTokenProvider.generateToken(existingUser.getEmail());
+        } catch (Exception e) {
+            throw new CustomException("Could not generate token: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Đăng nhập bằng Google

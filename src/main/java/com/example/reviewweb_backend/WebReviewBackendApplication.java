@@ -1,13 +1,13 @@
-package com.example.ReviewWeb_Backend;
+package com.example.reviewweb_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReviewWebBackendApplication {
+public class WebReviewBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ReviewWebBackendApplication.class, args);
+		SpringApplication.run(WebReviewBackendApplication.class, args);
 	}
 
 }

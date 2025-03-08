@@ -1,4 +1,4 @@
-package com.example.ReviewWeb_Backend.config;
+package com.example.reviewweb_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +20,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .defaultSuccessUrl("/api/auth/oauth2/success", true));
-        http.csrf(csrf -> csrf.disable());
+                        .defaultSuccessUrl("/api/auth/oauth2/success", true)
+                )
+                .csrf(csrf -> csrf.disable());
+
         return http.build();
     }
 }
